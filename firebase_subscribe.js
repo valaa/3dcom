@@ -16,11 +16,11 @@ if ('Notification' in window) {
 
     // по клику, запрашиваем у пользователя разрешение на уведомления
     // и подписываем его
-    $('#subscribe').on('click', function () {
+    
+}
+$('#subscribe').on('click', function () {
         subscribe();
     });
-}
-
 function subscribe() {
     // запрашиваем разрешение на получение уведомлений
     messaging.requestPermission()
