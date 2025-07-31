@@ -5,13 +5,21 @@ firebase.initializeApp({
 
 var messaging = firebase.messaging();
 
-document.getElementById('send').onclick = function() {
-    if (isTokenSentToServer()) {
-        send('/send.php');
-    } else {
-        console.error('Token not sent to server.');
+// Ждем загрузки DOM
+document.addEventListener('DOMContentLoaded', function() {
+    const sendBtn = document.getElementById('send');
+    if (sendBtn) {
+        sendBtn.onclick = function() {
+            if (isTokenSentToServer()) {
+                send('/send.php');
+                showNotificationStatus('Отправка уведомления...', 'info');
+            } else {
+                console.error('Token not sent to server.');
+                showNotificationStatus('Ошибка: токен не отправлен на сервер', 'error');
+            }
+        };
     }
-};
+});
 
 messaging.onMessage(function(payload) {
     console.log('Message received. ', payload);
@@ -46,6 +54,29 @@ messaging.requestPermission()
 function send(url, data) {
     var xhr = new XMLHttpRequest();
     xhr.open('POST', url, true);
+
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+                try {
+                    const response = JSON.parse(xhr.responseText);
+                    if (response.success !== undefined) {
+                        if (response.success > 0) {
+                            showNotificationStatus('Уведомление успешно отправлено!', 'success');
+                        } else {
+                            showNotificationStatus('Ошибка отправки уведомления', 'error');
+                        }
+                    } else {
+                        showNotificationStatus('Уведомление отправлено', 'success');
+                    }
+                } catch (e) {
+                    showNotificationStatus('Уведомление отправлено', 'success');
+                }
+            } else {
+                showNotificationStatus('Ошибка сети при отправке уведомления', 'error');
+            }
+        }
+    };
 
     if (data) {
         var params = '';
@@ -82,4 +113,20 @@ function isTokenSentToServer() {
 
 function setTokenSentToServer(sent) {
     window.localStorage.setItem('sentToServer', sent ? 1 : 0);
+}
+
+// Функция для отображения статуса уведомлений
+function showNotificationStatus(message, type) {
+    const statusElement = document.getElementById('notification-status');
+    if (statusElement) {
+        const alertClass = type === 'error' ? 'alert-error' : type === 'success' ? 'alert-success' : 'alert-info';
+        statusElement.innerHTML = `<div class="alert ${alertClass}" style="margin-top: 15px;">${message}</div>`;
+        
+        // Убрать сообщение через 5 секунд, если это не ошибка
+        if (type !== 'error') {
+            setTimeout(() => {
+                statusElement.innerHTML = '';
+            }, 5000);
+        }
+    }
 }
