@@ -22,7 +22,19 @@
 </head>
 <body>
     <button type="button" id="send">Send notification</button>
-  
+    <div style="margin: 20px 0;">
+      <h2>Контакты</h2>
+      <form id="addContactForm">
+        <input type="text" id="contactName" placeholder="Имя" required>
+        <input type="text" id="contactPhone" placeholder="Телефон" required>
+        <input type="text" id="contactType" placeholder="Вид деятельности" required>
+        <button type="submit">Добавить контакт</button>
+      </form>
+      <input type="text" id="searchContact" placeholder="Поиск по контактам" style="margin-top:10px; width: 300px;">
+      <ul id="contactsList" style="list-style:none; padding:0; margin-top:10px;"></ul>
+      <button type="button" id="sendMessageToContacts">Отправить сообщение выбранным</button>
+    </div>
+    <script src="contacts.js"></script>
 </body>
 </html>
 
